@@ -32,10 +32,6 @@ intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
-numbers = [10, 20, 30, 70, 191, 23]  
-filename = 'numbers.json'        
-with open(filename, 'w') as file_object:  
- json.dump(numbers, file_object)  
 # Command syncing
 @client.event
 async def on_ready():
@@ -43,9 +39,6 @@ async def on_ready():
     await tree.sync()
     print("Ready!")
 # Creating commands
-@tree.command(name='helloworld', description='Says Hello World')
-async def helloword(interaction: discord.Interaction):
-    await interaction.response.send_message("Hello World!")
 @tree.command(name='create', description='creates your profile')
 async def profile(interaction: discord.Interaction ):
   if str(interaction.user.id) in bal:
@@ -67,12 +60,6 @@ async def profile(interaction: discord.Interaction ):
       json.dump(fishfood, file_object)
   with open('fish.json', 'w') as file_object:  
       json.dump(fishes, file_object)
-@tree.command(name='numbers', description='just random numbers')
-async def numbers(interaction: discord.Interaction ):
-    with open('numbers.json') as file_object:  
-      data=json.load(file_object)
-    await interaction.response.send_message(data)
-
 @tree.command(name='work', description='work for money')
 @discord.app_commands.checks.cooldown(1, 10.0, key=lambda i: i.user.id)
 async def work(interaction: discord.Interaction):
