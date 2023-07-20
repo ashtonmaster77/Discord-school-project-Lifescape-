@@ -73,7 +73,6 @@ intents.members = True
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
 
-
 # Command syncing
 @client.event
 async def on_ready():
@@ -95,6 +94,7 @@ async def my_task():
 
 
 # Creating commands
+
 @tree.command(name='create', description='creates your profile')
 async def profile(interaction: discord.Interaction):
   if str(interaction.user.id) in bal:
@@ -164,7 +164,7 @@ async def work(interaction: discord.Interaction):
 
 
 @work.error
-async def on_test_error(interaction: discord.Interaction,
+async def on_work_error(interaction: discord.Interaction,
                         error: discord.app_commands.AppCommandError):
   if isinstance(error, discord.app_commands.CommandOnCooldown):
     await interaction.response.send_message(str(error), ephemeral=True)
@@ -275,6 +275,7 @@ async def help(interaction: discord.Interaction):
 
 @tree.command(name='fish',
               description='You can catch fish with your fishing rod!')
+@discord.app_commands.checks.cooldown(1, 10.0, key=lambda i: i.user.id)
 async def fish(interaction: discord.Interaction):
   if str(interaction.user.id) in bal:
     if 'old fishing rod' in inv[str(interaction.user.id)]:
@@ -342,6 +343,12 @@ async def fish(interaction: discord.Interaction):
   else:
     await interaction.response.send_message(
       "Please create your profile with /create!")
+
+@fish.error
+async def on_fish_error(interaction: discord.Interaction,
+                        error: discord.app_commands.AppCommandError):
+  if isinstance(error, discord.app_commands.CommandOnCooldown):
+    await interaction.response.send_message(str(error), ephemeral=True)
 
 
 @tree.command(
@@ -555,7 +562,7 @@ async def invest(interaction: discord.Interaction, investment: str,
           }
           bal[str(interaction.user.id)] -= amount
           await interaction.response.send_message(
-            'You have invested in {}'.format(investment))
+            'You have invested {} into {}!\nPlease check the status of your investment with /investment_status \nA code will be provided for you to claim your investment when it is complete!'.format(amount,investment))
           with open('invest.json', 'w') as file_object:
             json.dump(investids, file_object)
 
@@ -596,7 +603,7 @@ async def investstatus(interaction: discord.Interaction):
 
       ftime = mins, secs
       if time == 0:
-        await interaction.response.send_message(
+        invest_embed.add_field(
           'Your ${} investment is complete! Please enter this code into the invest_claim:{}.'
           .format(investids[str(interaction.user.id)][i]["amount"], i))
       else:
@@ -619,10 +626,10 @@ async def investclaim(interaction: discord.Interaction, code: str):
         chance = random.randint(0, 100)
         if chance < Investments[investids[str(
             interaction.user.id)][code]["name"]][2]:
-          returns = (
+          returns = int((
             Investments[investids[str(interaction.user.id)][code]["name"]][0] /
-            100 + 1) * investids[str(interaction.user.id)][code]["amount"]
-          bal[interaction.user.id] += returns
+            100 + 1) * investids[str(interaction.user.id)][code]["amount"])
+          bal[str(interaction.user.id)] += returns
           await interaction.response.send_message(
             'Your investment is successful! Your returns are ${}'.format(
               returns))
