@@ -55,6 +55,7 @@ platfish = ['koi', 'flowerhorn', 'arowana']
 goldfish = ['axolotl', 'pufferfish', 'swordfish']
 silverfish = ['tilapia', 'cod', 'salmon']
 normalfish = ['goldfish', 'sardine', 'tuna']
+vowels=['a','e','i','o','u']
 #opening Json to define client
 with open('fishfood.json') as file_object:
   fishfood = json.load(file_object)
@@ -313,6 +314,10 @@ async def fish(interaction: discord.Interaction):
             fishes[str(interaction.user.id)][fi] += 1
           else:
             fishes[str(interaction.user.id)][fi] = 1
+          if fi[0] in vowels:
+            a='an'
+          else:
+            a='a'
           await interaction.response.edit_message(
             content='You have caught a {} fish!'.format(fi), view=view)
           with open('fbal.json', 'w') as file_object:
