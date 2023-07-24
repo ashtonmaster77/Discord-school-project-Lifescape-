@@ -73,7 +73,7 @@ intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
 tree = discord.app_commands.CommandTree(client)
-
+numbers = [10, 20, 30, 70, 191, 23]
 # Command syncing
 @client.event
 async def on_ready():
@@ -95,7 +95,6 @@ async def my_task():
 
 
 # Creating commands
-
 @tree.command(name='create', description='creates your profile')
 async def profile(interaction: discord.Interaction):
   if str(interaction.user.id) in bal:
@@ -165,7 +164,7 @@ async def work(interaction: discord.Interaction):
 
 
 @work.error
-async def on_work_error(interaction: discord.Interaction,
+async def on_test_error(interaction: discord.Interaction,
                         error: discord.app_commands.AppCommandError):
   if isinstance(error, discord.app_commands.CommandOnCooldown):
     await interaction.response.send_message(str(error), ephemeral=True)
@@ -285,7 +284,6 @@ async def fish(interaction: discord.Interaction):
       mybutton = discord.ui.Button(label='cast')
 
       async def mybutton_callback(interaction: discord.Interaction):
-        f = random.randint(1, 2)
         if fishfood[str(interaction.user.id)] > 0:
           fishfood[str(interaction.user.id)] -= 1
           f = random.randint(1, 4)
@@ -294,7 +292,7 @@ async def fish(interaction: discord.Interaction):
           else:
             f = 1
         else:
-          f = random.randint(1, 2)
+          f = random.randint(1, 3)
         if f == 2:
           mybutton.label = '✅'
           mybutton.disabled = True
@@ -319,7 +317,7 @@ async def fish(interaction: discord.Interaction):
           else:
             a='a'
           await interaction.response.edit_message(
-            content='You have caught a {} fish!'.format(fi), view=view)
+            content='You have caught {} {} fish!'.format(a,fi), view=view)
           with open('fbal.json', 'w') as file_object:
             json.dump(fbal, file_object)
           with open('fish.json', 'w') as file_object:
@@ -552,7 +550,7 @@ async def invest(interaction: discord.Interaction, investment: str,
                  amount: int):
   if str(interaction.user.id) in bal:
     if investment in Investments:
-      if amount > Investments[investment][1]:
+      if amount >= Investments[investment][1]:
         if bal[str(interaction.user.id)] > amount:
           #create unique Id for the investment dictionary timer
           investid = str(uuid.uuid4())
@@ -567,7 +565,7 @@ async def invest(interaction: discord.Interaction, investment: str,
           }
           bal[str(interaction.user.id)] -= amount
           await interaction.response.send_message(
-            'You have invested {} into {}!\nPlease check the status of your investment with /investment_status \nA code will be provided for you to claim your investment when it is complete!'.format(amount,investment))
+            'You have invested ${} into {}!\nPlease check the status of your investment with /investment_status \nA code will be provided for you to claim your investment when it is complete!'.format(amount,investment))
           with open('invest.json', 'w') as file_object:
             json.dump(investids, file_object)
 
@@ -606,10 +604,10 @@ async def investstatus(interaction: discord.Interaction):
         secs = time % 60
         secs = str(int(secs)) + ' seconds'
 
-      ftime = mins, secs
+      ftime = mins +' '+ secs
       if time == 0:
-        invest_embed.add_field(
-          'Your ${} investment is complete! Please enter this code into the invest_claim:{}.'
+        invest_embed.add_field(name=name,value=
+          'Your ${} investment is complete! Please enter this code into the /claim_investment: {}'
           .format(investids[str(interaction.user.id)][i]["amount"], i))
       else:
         invest_embed.add_field(
@@ -653,7 +651,26 @@ async def investclaim(interaction: discord.Interaction, code: str):
   else:
     await interaction.response.send_message(
       "Please create your profile with /create!")
-
-
+@tree.command(name='give' ,description='You can give anyone money with this command')
+async def give(interaction: discord.Interaction, username: discord.User ,amount:int):
+  if str(interaction.user.id) in bal:
+    
+    if str(username.id) in bal:
+      if amount<=bal[str(interaction.user.id)]:
+        bal[str(interaction.user.id)]-=amount
+        bal[str(username.id)]+= amount
+        await interaction.response.send_message(
+      "You have given {} ${}".format(username.name,amount))
+        with open('bal.json','w') as file_object:
+          json.dump(bal,file_object)
+      else:
+        await interaction.response.send_message(
+      "You do not have money for the mentioned amount that you want to give!")
+    else:
+      await interaction.response.send_message(
+      "Please mention a valid user that has a profile!")
+  else:
+    await interaction.response.send_message(
+      "Please create your profile with /create!")
 keep_alive()
 client.run(os.environ['token'])
