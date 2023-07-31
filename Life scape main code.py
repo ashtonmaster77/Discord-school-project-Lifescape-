@@ -13,6 +13,8 @@ itemdesc = {
   'old fishing rod': 'A fishing rod that allows you to catch normal fish',
   'potato':
   'Just a potato? It increases your earnings of a job when you are lucky',
+  'Trophy':
+  'You won!',
   'silver rod': 'A fishing rod that allows you to catch silver fish',
   'golden rod': 'A fishing rod that allows you to catch golden fish',
   'platinum rod': 'A fishing rod that allows you to catch platinum fish',
@@ -24,8 +26,8 @@ Investments = {
   'f&b': [50, 2000, 60, 40],
   'entertainment': [60, 2500, 50, 50]
 }
-price = {'water': 1000, 'old fishing rod': 2000, 'potato': 3000}
-items = ['water', 'old fishing rod', 'potato']
+price = {'water': 1000, 'old fishing rod': 2000, 'potato': 3000,'Trophy':\5000000}
+items = ['water', 'old fishing rod', 'potato','Trophy']
 fitems = ['silver rod', 'golden rod', 'platinum rod', 'fish food']
 fishprice = {
   'silver rod': 100,
